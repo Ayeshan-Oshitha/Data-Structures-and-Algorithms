@@ -1,13 +1,15 @@
-class LinkedList {
+class DoublyLinkedList {
 
-    // Linked list Node.
+    // Linked list Node  .
     class Node {
         int data;
         Node next;
+        Node prev;
 
         Node(int d){
             this.data = d;
             this.next = null;
+            this.prev = null;
         }
     }
 
@@ -19,7 +21,7 @@ class LinkedList {
 
 
 
-    //  create the linked list
+    // create the link list
     public void Implement(int data){
 
         Node newNode = new Node(data);
@@ -35,13 +37,14 @@ class LinkedList {
                 temp = temp.next;
             }
             temp.next = newNode;
+            newNode.prev = temp;
         }
         count++;
     }
 
 
 
-    // display the link list
+    // display the linked list
     public void Display(){
         Node temp = head;
         while (temp != null){
@@ -55,8 +58,10 @@ class LinkedList {
 
     // insert from beginning
     public void InsertAtBeginning(int data){
+        // This code block doesn't handle the case when Linked list is empty
         Node newNode = new Node(data);
         newNode.next = head;
+        head.prev = newNode;
         head = newNode;
         count++;
     }
@@ -73,29 +78,36 @@ class LinkedList {
             temp = temp.next;
         }
         temp.next = newNode;
+        newNode.prev = temp;
+
         count++;
     }
 
 
 
-   // insert after a given position ( After a particular node)
-   public void InsertAfterPosition(int data, int position){
-    if( position > count ){
-        throw new IllegalArgumentException("Out of Linked List, Maximum position is :" + count);
-    } else{
-        Node newNode = new Node(data);
+    // insert after a given position ( After a particular node)
+    public void InsertAfterPosition(int data, int position){
+        if( position > count ){
+            throw new IllegalArgumentException("Out of Linked List, Maximum position is :" + count);
+        } else if (position == 4) {
+            InsertAtEnd(data);
+        } else{
+            Node newNode = new Node(data);
 
-        Node temp = head;
-        int i = 1;
-        while (i < position){
-            temp = temp.next;
-            i++;
+            Node temp = head;
+            int i = 1;
+            while (i < position){
+                temp = temp.next;
+                i++;
+            }
+            Node nextNode = temp.next;
+            newNode.next = temp.next;
+            newNode.prev = nextNode.prev;
+            temp.next = newNode;
+            nextNode.prev = newNode;
+            count++;
         }
-        newNode.next = temp.next;
-        temp.next = newNode;
-        count++;
     }
-}
 
 
 
@@ -114,8 +126,11 @@ class LinkedList {
                 temp = temp.next;
                 i++;
             }
+            Node nextNode = temp.next;
             newNode.next = temp.next;
+            newNode.prev = nextNode.prev;
             temp.next = newNode;
+            nextNode.prev = newNode;
             count++;
         }
     }
@@ -132,7 +147,7 @@ class LinkedList {
         head = head.next;
         count--;
 
-        // break the link of temp
+        // break the link of temp(deleted Node)
         temp.next = null;
     }
 
@@ -160,8 +175,8 @@ class LinkedList {
         }
         count--;
 
-        // break the link of temp ( Infact Not needed, Because last node is already null )
-        temp.next = null;
+        // break the link of Temp (deleted Node)
+        temp.prev = null;
     }
 
 
@@ -175,65 +190,77 @@ class LinkedList {
             throw new IllegalArgumentException("Out of Linked List, Maximum position is :" + count);
         } else if (position == 1) {
             DeleteFromBeginning();
-        }else{
+        } else if (position == count) {
+            DeleteFromEnd();
+        } else{
             Node temp = head;
-            Node nextNode  ;
+
             int i = 1;
-            while (i < position - 1){
+            while (i < position ){
+                // traverse to position
                 temp = temp.next;
                 i++;
             }
-            nextNode = temp.next;
-            temp.next = nextNode.next;
+            Node nextNode = temp.next;
+            Node prevNode = temp.prev;
+            prevNode.next = temp.next;
+            nextNode.prev = temp.prev;
             count--;
 
-            // break the link of temp
-            nextNode.next = null;
+            // break the link of temp(deleted Node)
+            temp.next = null;
+            temp.prev = null;
         }
     }
 
-    
+
+
 
     // Reverse the Linked list
     public void Reverse(){
-        Node prevNode,currentNode,nextNode;
 
-        currentNode = head;
-        nextNode = head;
-        prevNode = null;
+       Node currentNode = head;
+       Node nextNode = null;
 
-        while (nextNode != null){
-            nextNode = nextNode.next;
-            currentNode.next = prevNode;
-            prevNode = currentNode;
-            currentNode = nextNode;
-        }
-        head = prevNode;
+      Node tail = head;
+      // Find the last node of linked list
+      while (tail.next != null){
+          tail = tail.next;
+      }
+
+       while(currentNode != null){
+           nextNode = currentNode.next;
+           currentNode.next = currentNode.prev;
+           currentNode.prev = nextNode;
+           currentNode = nextNode;
+       }
+
+        head = tail;
     }
 
 
+    
     public static void main(String[] args){
 
-        LinkedList list = new LinkedList();
+        DoublyLinkedList list = new DoublyLinkedList();
 
         list.Implement(3);
         list.Implement(6);;
         list.Implement(4);
         list.Implement(7);
 
+        list.Display();
+
         list.InsertAtBeginning(1);
         list.InsertAtEnd(9);
-        list.InsertAfterPosition(21,1);
-        list.InsertAtPosition(31,1);
+        list.InsertAfterPosition(21,4);
+        list.InsertAtPosition(31,3);
 
         list.DeleteFromBeginning();
         list.DeleteFromEnd();
-        list.DeleteAtPosition(1);
-
-        list.Display();
-
+        list.DeleteAtPosition(3);
+        
         list.Reverse();
         list.Display();
-
     }
 }
