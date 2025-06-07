@@ -15,7 +15,7 @@ class LinkedList {
     Node head ;
 
     // To calculate the length of linked list
-    static int count = 0;
+    int count = 0;
 
 
 
